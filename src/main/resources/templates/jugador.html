@@ -58,10 +58,21 @@
             background-color: #00ccaa;
         }
 
+        .btn-logout {
+            background-color: #ff4d4d;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .btn-logout:hover {
+            background-color: #cc0000;
+        }
+
         h1 {
             color: #00ffcc;
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .sin-juegos {
@@ -69,33 +80,76 @@
             font-style: italic;
             color: #aaa;
         }
+
+        .logout-container {
+            text-align: right;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Bienvenido, <span th:text="${usuario.nombre}">Jugador</span> 🎮</h1>
+    <h1>Bienvenido, <span th:text="${usuario?.nombre} ?: 'Jugador'">Jugador</span> 🎮</h1>
+
+    <div class="logout-container">
+        <form th:action="@{/login}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-logout btn-sm">Cerrar Sesión</button>
+        </form>
+    </div>
 
     <h2 class="mb-4">Juegos Aprobados</h2>
-    <div class="row" th:if="${videojuegos.size() > 0}">
+    <div class="row" th:if="${videojuegos?.size() > 0}">
         <div class="col-md-4" th:each="juego : ${videojuegos}">
             <div class="game-card">
-                <img th:src="${juego.thumbnail}" class="card-img-top" th:alt="${juego.title}">
+                <img th:src="${juego.thumbnail} ?: 'https://via.placeholder.com/300x200'" class="card-img-top" th:alt="${juego.title} ?: 'Juego'">
                 <div class="card-body">
-                    <h5 class="card-title" th:text="${juego.title}">Nombre</h5>
-                    <p class="card-text" th:text="${juego.shortDescription}">Descripción breve del juego.</p>
-                    <p><strong>Género:</strong> <span th:text="${juego.genre}">Acción</span></p>
-                    <p><strong>Plataforma:</strong> <span th:text="${juego.platform}">PC</span></p>
-                    <a class="btn btn-jugar btn-sm" th:href="${juego.gameUrl}" target="_blank">Jugar Ahora</a>
+                    <h5 class="card-title" th:text="${juego.title} ?: 'Sin título'">Nombre</h5>
+                    <p class="card-text" th:text="${juego.shortDescription} ?: 'Sin descripción'">Descripción breve del juego.</p>
+                    <p><strong>Género:</strong> <span th:text="${juego.genre} ?: 'Desconocido'">Acción</span></p>
+                    <p><strong>Plataforma:</strong> <span th:text="${juego.platform} ?: 'Desconocida'">PC</span></p>
+                    <a class="btn btn-jugar btn-sm" th:href="${juego.gameUrl} ?: '#'">Jugar Ahora</a>
+                    <form th:action="@{/jugador/favorito}" method="post" style="display:inline;">
+                        <input type="hidden" name="title" th:value="${juego.title}">
+                        <button type="submit" class="btn btn-outline-light btn-sm">💖 Favorito</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="sin-juegos" th:if="${videojuegos.size() == 0}">
-        No hay juegos aprobados disponibles aún.
+    <div class="sin-juegos" th:if="${videojuegos == null or videojuegos.size() == 0}">
+        No hay juegos aprobados disponibles aún. 🚫
     </div>
 </div>
+
+<!-- Juegos Favoritos -->
+<h2 class="section-title">Tus Favoritos</h2>
+<div class="row" th:if="${favoritos.size() > 0}">
+    <div class="col-md-4" th:each="juego : ${favoritos}">
+        <div class="game-card">
+            <img th:src="${juego.thumbnail}" class="card-img-top" th:alt="${juego.title}">
+            <div class="card-body">
+                <h5 class="card-title" th:text="${juego.title}">Nombre</h5>
+                <p class="card-text" th:text="${juego.shortDescription}">Descripción breve.</p>
+                <p><strong>Género:</strong> <span th:text="${juego.genre}">Acción</span></p>
+                <p><strong>Plataforma:</strong> <span th:text="${juego.platform}">PC</span></p>
+
+                <a class="btn btn-jugar btn-sm" th:href="${juego.getGameUrl()}" target="_blank">Jugar Ahora</a>
+                <form th:action="@{/jugador/favorito/eliminar}" method="post" style="display:inline;">
+                    <input type="hidden" name="title" th:value="${juego.title}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Eliminar</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="sin-juegos" th:if="${favoritos.size() == 0}">
+    Aún no has marcado juegos como favoritos. 💔
+</div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
