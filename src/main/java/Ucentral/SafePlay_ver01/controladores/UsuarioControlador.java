@@ -1,7 +1,9 @@
 package Ucentral.SafePlay_ver01.controladores;
 
+import Ucentral.SafePlay_ver01.persistencia.entidades.Favorito;
 import Ucentral.SafePlay_ver01.persistencia.entidades.Usuario;
 import Ucentral.SafePlay_ver01.persistencia.entidades.VideojuegoDTO;
+import Ucentral.SafePlay_ver01.servicios.FavoritoServicio;
 import Ucentral.SafePlay_ver01.servicios.UsuarioServicio;
 import Ucentral.SafePlay_ver01.servicios.VideojuegoServicio;
 import jakarta.servlet.http.HttpSession;
@@ -11,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -19,10 +22,13 @@ public class UsuarioControlador {
 
     private final UsuarioServicio usuarioServicio;
     private final VideojuegoServicio videojuegoServicio;
+    private final FavoritoServicio favoritoServicio;
 
-    public UsuarioControlador(UsuarioServicio usuarioServicio, VideojuegoServicio videojuegoServicio) {
+    public UsuarioControlador(UsuarioServicio usuarioServicio, VideojuegoServicio videojuegoServicio, FavoritoServicio favoritoServicio) {
         this.usuarioServicio = usuarioServicio;
         this.videojuegoServicio = videojuegoServicio;
+        this.favoritoServicio = favoritoServicio;
+
     }
 
     @GetMapping("/")
@@ -85,10 +91,43 @@ public class UsuarioControlador {
             return "redirect:/login";
         }
 
+        // Juegos aprobados
         List<VideojuegoDTO> juegosAprobados = videojuegoServicio.obtenerVideojuegosAprobados();
+
+        // Títulos favoritos
+        List<Favorito> favoritos = favoritoServicio.obtenerFavoritosDeUsuario(usuario.getUsuario());
+        List<String> titulosFavoritos = favoritos.stream().map(Favorito::getJuegoTitle).toList();
+
+        // Detalles de los juegos favoritos
+        List<VideojuegoDTO> todos = videojuegoServicio.obtenerVideojuegos();
+        List<VideojuegoDTO> juegosFavoritos = todos.stream()
+                .filter(j -> titulosFavoritos.contains(j.getTitle()))
+                .toList();
+
         model.addAttribute("usuario", usuario);
         model.addAttribute("videojuegos", juegosAprobados);
+        model.addAttribute("favoritos", juegosFavoritos);
+
         return "jugador";
     }
+    @PostMapping("/jugador/favorito")
+    public String marcarFavorito(@RequestParam("title") String title, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
 
+        favoritoServicio.guardarFavorito(usuario.getUsuario(), title);
+        return "redirect:/jugador";
+    }
+    @PostMapping("/jugador/favorito/eliminar")
+    public String eliminarFavorito(@RequestParam("title") String title, HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        favoritoServicio.eliminarFavorito(usuario.getUsuario(), title);
+        return "redirect:/jugador";
+    }
 }

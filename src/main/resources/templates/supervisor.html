@@ -36,6 +36,11 @@
 <div class="container">
   <h1 class="mb-4">Bienvenido, <span th:text="${usuario.nombre}">Supervisor</span></h1>
   <h2 class="mb-4">Videojuegos disponibles para supervisión</h2>
+  <div class="logout-container">
+    <form th:action="@{/login}" method="post" style="display:inline;">
+      <button type="submit" class="btn btn-logout btn-sm">Cerrar Sesión</button>
+    </form>
+  </div>
 
   <div class="row">
     <div class="col-md-4" th:each="juego : ${videojuegos}">
