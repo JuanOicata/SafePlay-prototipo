@@ -1,11 +1,7 @@
 package Ucentral.SafePlay_ver01.controladores;
 
-import Ucentral.SafePlay_ver01.persistencia.entidades.Favorito;
-import Ucentral.SafePlay_ver01.persistencia.entidades.Usuario;
-import Ucentral.SafePlay_ver01.persistencia.entidades.VideojuegoDTO;
-import Ucentral.SafePlay_ver01.servicios.FavoritoServicio;
-import Ucentral.SafePlay_ver01.servicios.UsuarioServicio;
-import Ucentral.SafePlay_ver01.servicios.VideojuegoServicio;
+import Ucentral.SafePlay_ver01.persistencia.entidades.*;
+import Ucentral.SafePlay_ver01.servicios.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,11 +19,16 @@ public class UsuarioControlador {
     private final UsuarioServicio usuarioServicio;
     private final VideojuegoServicio videojuegoServicio;
     private final FavoritoServicio favoritoServicio;
+    private final EvaluacionServicio evaluacionServicio;
+    private final RecomendacionServicio recomendacionServicio;
 
-    public UsuarioControlador(UsuarioServicio usuarioServicio, VideojuegoServicio videojuegoServicio, FavoritoServicio favoritoServicio) {
+
+    public UsuarioControlador(UsuarioServicio usuarioServicio, VideojuegoServicio videojuegoServicio, FavoritoServicio favoritoServicio, EvaluacionServicio evaluacionServicio, RecomendacionServicio recomendacionServicio) {
         this.usuarioServicio = usuarioServicio;
         this.videojuegoServicio = videojuegoServicio;
         this.favoritoServicio = favoritoServicio;
+        this.evaluacionServicio = evaluacionServicio;
+        this.recomendacionServicio = recomendacionServicio;
 
     }
 
@@ -104,9 +105,12 @@ public class UsuarioControlador {
                 .filter(j -> titulosFavoritos.contains(j.getTitle()))
                 .toList();
 
+        List<Recomendacion> recomendaciones = recomendacionServicio.obtenerPorUsuario(usuario.getUsuario());
+
         model.addAttribute("usuario", usuario);
         model.addAttribute("videojuegos", juegosAprobados);
         model.addAttribute("favoritos", juegosFavoritos);
+        model.addAttribute("recomendaciones", recomendaciones);
 
         return "jugador";
     }
@@ -130,4 +134,46 @@ public class UsuarioControlador {
         favoritoServicio.eliminarFavorito(usuario.getUsuario(), title);
         return "redirect:/jugador";
     }
+
+    @GetMapping("/jugador/evaluar")
+    public String mostrarFormularioEvaluacion(@RequestParam("title") String title, HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) return "redirect:/login";
+
+        model.addAttribute("juegoTitle", title);
+        return "evaluacion"; // Vista HTML que crearemos
+    }
+
+    @PostMapping("/jugador/evaluar")
+    public String procesarEvaluacion(@RequestParam String juegoTitle,
+                                     @RequestParam String emocion,
+                                     @RequestParam boolean violento,
+                                     @RequestParam(required = false) List<String> tiposViolencia,
+                                     @RequestParam(required = false) String nivelViolencia,
+                                     @RequestParam(required = false) String comentarios,
+                                     HttpSession session) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null) return "redirect:/login";
+
+        // Combinar lista de tipos de violencia en un string separado por comas
+        String tiposViolenciaTexto = (tiposViolencia != null && !tiposViolencia.isEmpty())
+                ? String.join(", ", tiposViolencia)
+                : "Ninguno";
+
+        Evaluacion eval = new Evaluacion();
+        eval.setUsuarioId(usuario.getUsuario());
+        eval.setJuegoTitle(juegoTitle);
+        eval.setEmocion(emocion);
+        eval.setViolento(violento);
+        eval.setTiposViolencia(tiposViolenciaTexto);
+        eval.setNivelViolencia(nivelViolencia != null ? nivelViolencia : "No especificado");
+        eval.setComentarios(comentarios != null ? comentarios : "");
+
+        evaluacionServicio.guardarEvaluacion(eval);
+
+        return "redirect:/jugador";
+    }
+
+
 }

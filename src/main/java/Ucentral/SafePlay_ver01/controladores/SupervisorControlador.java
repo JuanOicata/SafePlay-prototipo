@@ -1,9 +1,12 @@
 package Ucentral.SafePlay_ver01.controladores;
 
+import Ucentral.SafePlay_ver01.persistencia.entidades.Evaluacion;
 import Ucentral.SafePlay_ver01.persistencia.entidades.Usuario;
 import Ucentral.SafePlay_ver01.persistencia.entidades.Videojuego;
 import Ucentral.SafePlay_ver01.persistencia.entidades.VideojuegoDTO;
 import Ucentral.SafePlay_ver01.persistencia.repositorio.VideojuegoRepositorio;
+import Ucentral.SafePlay_ver01.servicios.EvaluacionServicio;
+import Ucentral.SafePlay_ver01.servicios.RecomendacionServicio;
 import Ucentral.SafePlay_ver01.servicios.VideojuegoServicio;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,12 @@ public class SupervisorControlador {
 
     @Autowired
     private VideojuegoRepositorio videojuegoRepositorio;
+
+    @Autowired
+    private EvaluacionServicio evaluacionServicio;
+
+    @Autowired
+    private RecomendacionServicio recomendacionServicio;
 
     @GetMapping
     public String mostrarVideojuegos(HttpSession session, Model model) {
@@ -54,4 +63,36 @@ public class SupervisorControlador {
         videojuegoRepositorio.save(videojuego);
         return "redirect:/supervisor";
     }
+
+    @GetMapping("/evaluaciones")
+    public String verEvaluacionesPorJuego(@RequestParam(required = false) String title,
+                                          HttpSession session,
+                                          Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        if (usuario == null || !"supervisor".equalsIgnoreCase(usuario.getRol())) {
+            return "redirect:/login";
+        }
+
+        List<Evaluacion> evaluaciones;
+        if (title != null && !title.isEmpty()) {
+            evaluaciones = evaluacionServicio.obtenerPorJuego(title);
+            model.addAttribute("filtroJuego", title);
+        } else {
+            evaluaciones = evaluacionServicio.obtenerTodas();
+        }
+
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("evaluaciones", evaluaciones);
+        return "supervisor-evaluaciones"; // este HTML debe existir
+    }
+
+
+    @PostMapping("/recomendar")
+    public String enviarRecomendacion(@RequestParam String usuarioId,
+                                      @RequestParam String juegoTitle,
+                                      @RequestParam String mensaje) {
+        recomendacionServicio.guardar(usuarioId, juegoTitle, mensaje);
+        return "redirect:/supervisor/evaluaciones";
+    }
+
 }

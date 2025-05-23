@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluar Juego</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e1e2f 0%, #2a2a4a 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        h2 {
+            color: #00ffcc;
+            text-shadow: 0 0 5px rgba(0, 255, 204, 0.6);
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background-color: #00ffcc;
+            border-color: #00ffcc;
+            color: #1e1e2f;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #00ccaa;
+        }
+
+        .form-check-label {
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Evaluar Juego: <span th:text="${juegoTitle}">Nombre</span></h2>
+    <form th:action="@{/jugador/evaluar}" method="post">
+        <input type="hidden" name="juegoTitle" th:value="${juegoTitle}" />
+
+        <!-- Emoción -->
+        <div class="mb-3">
+            <label for="emocion" class="form-label">¿Qué emoción predominó durante el juego?</label>
+            <select name="emocion" id="emocion" class="form-select" required>
+                <option value="">Selecciona una emoción</option>
+                <option value="diversión">Diversión</option>
+                <option value="miedo">Miedo</option>
+                <option value="ira">Ira</option>
+                <option value="tristeza">Tristeza</option>
+                <option value="estrés">Estrés</option>
+                <option value="neutral">Neutral</option>
+            </select>
+        </div>
+
+        <!-- Percibió violencia -->
+        <div class="mb-3">
+            <label class="form-label">¿Percibiste contenido violento?</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="violento" value="true" required>
+                <label class="form-check-label">Sí</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="violento" value="false">
+                <label class="form-check-label">No</label>
+            </div>
+        </div>
+
+        <!-- Tipos de violencia -->
+        <div class="mb-3">
+            <label class="form-label">¿Qué tipo de violencia observaste? (selecciona todas las que apliquen)</label>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="tiposViolencia" value="física">
+                <label class="form-check-label">Física</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="tiposViolencia" value="verbal">
+                <label class="form-check-label">Verbal</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="tiposViolencia" value="psicológica">
+                <label class="form-check-label">Psicológica</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="tiposViolencia" value="Ninguna">
+                <label class="form-check-label">Ninguna</label>
+            </div>
+        </div>
+
+        <!-- Nivel de violencia -->
+        <div class="mb-3">
+            <label for="nivelViolencia" class="form-label">¿Cómo calificarías el nivel de violencia?</label>
+            <select name="nivelViolencia" id="nivelViolencia" class="form-select">
+                <option value="">Selecciona una opción</option>
+                <option value="sin violencia">Ninguna</option>
+                <option value="bajo">Bajo</option>
+                <option value="moderado">Moderado</option>
+                <option value="alto">Alto</option>
+            </select>
+        </div>
+
+        <!-- Comentarios -->
+        <div class="mb-3">
+            <label for="comentarios" class="form-label">Comentarios adicionales</label>
+            <textarea name="comentarios" id="comentarios" class="form-control" rows="3" placeholder="Escribe aquí tus comentarios..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enviar Evaluación</button>
+        <a href="/jugador" class="btn btn-outline-light">Cancelar</a>
+    </form>
+</div>
+
+</body>
+</html>
