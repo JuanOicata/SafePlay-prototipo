@@ -140,6 +140,10 @@
                     <input type="hidden" name="title" th:value="${juego.title}">
                     <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Eliminar</button>
                 </form>
+                <a class="btn btn-outline-info btn-sm"
+                   th:href="@{'/jugador/evaluar?title=' + ${juego.title}}">
+                    📝 Evaluar Juego
+                </a>
 
             </div>
         </div>
@@ -148,6 +152,18 @@
 <div class="sin-juegos" th:if="${favoritos.size() == 0}">
     Aún no has marcado juegos como favoritos. 💔
 </div>
+</div>
+<h2 class="section-title">📩 Recomendaciones del Supervisor</h2>
+<div class="row" th:if="${recomendaciones.size() > 0}">
+    <div class="col-md-12" th:each="reco : ${recomendaciones}">
+        <div class="alert alert-info">
+            <strong th:text="'Juego: ' + ${reco.juegoTitle}">Juego:</strong><br/>
+            <span th:text="${reco.mensaje}">Mensaje del supervisor</span>
+        </div>
+    </div>
+</div>
+<div class="sin-juegos" th:if="${recomendaciones.size() == 0}">
+    Aún no tienes mensajes del supervisor.
 </div>
 
 
