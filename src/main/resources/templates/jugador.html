@@ -5,85 +5,121 @@
     <title>Jugador - SafePlay</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Paleta inspirada en el mockup */
+        :root {
+            --bg-page: #ffffff;
+            --text-primary: #004d40;      /* Verde oscuro */
+            --text-secondary: #6c757d;    /* Gris */
+            --accent: #6f42c1;            /* Morado */
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+            --btn-bg: var(--accent);
+            --btn-text: #ffffff;
+            --btn-hover: #5937a1;         /* Morado más oscuro */
+        }
+
         body {
-            background: #121212;
-            color: #f0f0f0;
+            background: var(--bg-page);
+            color: var(--text-secondary);
             font-family: 'Segoe UI', sans-serif;
             padding: 2rem;
         }
 
         .container {
-            background: #1e1e2f;
-            border-radius: 15px;
-            padding: 2rem;
+            background: transparent;
+            padding: 0;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        h2 {
+            color: var(--text-primary);
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
         }
 
         .game-card {
-            background-color: #2a2a4a;
+            background-color: var(--card-bg);
             border-radius: 12px;
             overflow: hidden;
             transition: transform 0.3s;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.1);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px var(--card-shadow);
         }
-
         .game-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 24px rgba(0, 255, 204, 0.2);
+            box-shadow: 0 6px 30px var(--card-shadow);
         }
-
         .card-img-top {
             height: 200px;
             object-fit: cover;
         }
-
         .card-body {
             padding: 1.5rem;
         }
-
         .card-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #00ffcc;
+            color: var(--text-primary);
+        }
+        .card-text {
+            color: var(--text-secondary);
         }
 
         .btn-jugar {
-            background-color: #00ffcc;
+            background-color: var(--btn-bg);
             border: none;
-            color: #1e1e2f;
-            font-weight: bold;
+            color: var(--btn-text);
+            font-weight: 600;
         }
-
         .btn-jugar:hover {
-            background-color: #00ccaa;
+            background-color: var(--btn-hover);
         }
 
-        .btn-logout {
-            background-color: #ff4d4d;
-            border: none;
+        .btn-outline-light {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .btn-outline-light:hover {
+            background-color: var(--accent);
             color: #fff;
-            font-weight: bold;
         }
 
-        .btn-logout:hover {
-            background-color: #cc0000;
-        }
-
-        h1 {
-            color: #00ffcc;
+        .section-title {
+            color: var(--text-primary);
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
             text-align: center;
-            margin-bottom: 1rem;
         }
 
         .sin-juegos {
             text-align: center;
             font-style: italic;
-            color: #aaa;
+            color: var(--text-secondary);
+            margin-top: 1rem;
         }
 
         .logout-container {
             text-align: right;
             margin-bottom: 1rem;
+        }
+        .btn-logout {
+            background-color: #dc3545;
+            border: none;
+            color: #fff;
+        }
+        .btn-logout:hover {
+            background-color: #b02a37;
         }
     </style>
 </head>
@@ -91,6 +127,7 @@
 
 <div class="container">
     <h1>Bienvenido, <span th:text="${usuario?.nombre} ?: 'Jugador'">Jugador</span> 🎮</h1>
+    <p class="subtitle">Accede a tu biblioteca, juegos disponibles y gestiona tu tiempo</p>
 
     <div class="logout-container">
         <form th:action="@{/login}" method="post" style="display:inline;">
@@ -98,17 +135,17 @@
         </form>
     </div>
 
-    <h2 class="mb-4">Juegos Aprobados</h2>
-    <div class="row" th:if="${videojuegos?.size() > 0}">
+    <h2>Juegos Aprobados</h2>
+    <div class="row">
         <div class="col-md-4" th:each="juego : ${videojuegos}">
             <div class="game-card">
-                <img th:src="${juego.thumbnail} ?: 'https://via.placeholder.com/300x200'" class="card-img-top" th:alt="${juego.title} ?: 'Juego'">
+                <img th:src="${juego.thumbnail}" class="card-img-top" alt="" />
                 <div class="card-body">
-                    <h5 class="card-title" th:text="${juego.title} ?: 'Sin título'">Nombre</h5>
-                    <p class="card-text" th:text="${juego.shortDescription} ?: 'Sin descripción'">Descripción breve del juego.</p>
-                    <p><strong>Género:</strong> <span th:text="${juego.genre} ?: 'Desconocido'">Acción</span></p>
-                    <p><strong>Plataforma:</strong> <span th:text="${juego.platform} ?: 'Desconocida'">PC</span></p>
-                    <a class="btn btn-jugar btn-sm" th:href="${juego.gameUrl} ?: '#'">Jugar Ahora</a>
+                    <h5 class="card-title" th:text="${juego.title}"></h5>
+                    <p class="card-text" th:text="${juego.shortDescription}"></p>
+                    <p><strong>Género:</strong> <span th:text="${juego.genre}"></span></p>
+                    <p><strong>Plataforma:</strong> <span th:text="${juego.platform}"></span></p>
+                    <a class="btn btn-jugar btn-sm" th:href="${juego.gameUrl}" target="_blank">Jugar Ahora</a>
                     <form th:action="@{/jugador/favorito}" method="post" style="display:inline;">
                         <input type="hidden" name="title" th:value="${juego.title}">
                         <button type="submit" class="btn btn-outline-light btn-sm">💖 Favorito</button>
@@ -117,56 +154,117 @@
             </div>
         </div>
     </div>
-
-    <div class="sin-juegos" th:if="${videojuegos == null or videojuegos.size() == 0}">
+    <div class="sin-juegos" th:if="${videojuegos.size()==0}">
         No hay juegos aprobados disponibles aún. 🚫
     </div>
-</div>
 
-<!-- Juegos Favoritos -->
-<h2 class="section-title">Tus Favoritos</h2>
-<div class="row" th:if="${favoritos.size() > 0}">
-    <div class="col-md-4" th:each="juego : ${favoritos}">
-        <div class="game-card">
-            <img th:src="${juego.thumbnail}" class="card-img-top" th:alt="${juego.title}">
-            <div class="card-body">
-                <h5 class="card-title" th:text="${juego.title}">Nombre</h5>
-                <p class="card-text" th:text="${juego.shortDescription}">Descripción breve.</p>
-                <p><strong>Género:</strong> <span th:text="${juego.genre}">Acción</span></p>
-                <p><strong>Plataforma:</strong> <span th:text="${juego.platform}">PC</span></p>
-
-                <a class="btn btn-jugar btn-sm" th:href="${juego.getGameUrl()}" target="_blank">Jugar Ahora</a>
-                <form th:action="@{/jugador/favorito/eliminar}" method="post" style="display:inline;">
-                    <input type="hidden" name="title" th:value="${juego.title}">
-                    <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Eliminar</button>
-                </form>
-                <a class="btn btn-outline-info btn-sm"
-                   th:href="@{'/jugador/evaluar?title=' + ${juego.title}}">
-                    📝 Evaluar Juego
-                </a>
-
+    <h2 class="section-title">Tus Favoritos</h2>
+    <div class="row">
+        <div class="col-md-4" th:each="juego : ${favoritos}">
+            <div class="game-card">
+                <img th:src="${juego.thumbnail}" class="card-img-top" alt="" />
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${juego.title}"></h5>
+                    <a class="btn btn-jugar btn-sm" th:href="${juego.gameUrl}" target="_blank">Jugar Ahora</a>
+                    <form th:action="@{/jugador/favorito/eliminar}" method="post" style="display:inline;">
+                        <input type="hidden" name="title" th:value="${juego.title}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">🗑️ Eliminar</button>
+                    </form>
+                    <a class="btn btn-outline-info btn-sm" th:href="@{'/jugador/evaluar?title=' + ${juego.title}}">
+                        📝 Evaluar Juego
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+
+    <div class="sin-juegos" th:if="${favoritos.size()==0}">
+        Aún no has marcado juegos como favoritos. 💔
+    </div>
+
+    <h2 class="section-title">📩 Recomendaciones del Supervisor</h2>
+    <div class="row">
+        <div class="col-md-12" th:each="reco : ${recomendaciones}">
+            <div class="alert alert-info">
+                <strong th:text="'Juego: ' + ${reco.juegoTitle}"></strong><br/>
+                <span th:text="${reco.mensaje}"></span>
+            </div>
+        </div>
+    </div>
+    <div class="sin-juegos" th:if="${recomendaciones.size()==0}">
+        Aún no tienes mensajes del supervisor.
+    </div>
 </div>
-<div class="sin-juegos" th:if="${favoritos.size() == 0}">
-    Aún no has marcado juegos como favoritos. 💔
-</div>
-</div>
-<h2 class="section-title">📩 Recomendaciones del Supervisor</h2>
-<div class="row" th:if="${recomendaciones.size() > 0}">
-    <div class="col-md-12" th:each="reco : ${recomendaciones}">
-        <div class="alert alert-info">
-            <strong th:text="'Juego: ' + ${reco.juegoTitle}">Juego:</strong><br/>
-            <span th:text="${reco.mensaje}">Mensaje del supervisor</span>
+<!-- SafeBot Asistente Virtual -->
+<div id="chatbot" style="position: fixed; bottom: 20px; right: 20px; width: 320px; display: none; z-index: 9999;">
+    <div style="background-color: #6f42c1; border-radius: 10px 10px 0 0; padding: 10px; color: white; font-weight: bold;">
+        🎮 SafeBot - Tu Asistente
+    </div>
+    <div id="chatBody" style="background-color: #f8f9fa; color: #212529; max-height: 300px; overflow-y: auto; padding: 10px;">
+        <div><strong>SafeBot:</strong> ¡Hola! ¿En qué puedo ayudarte hoy?</div>
+    </div>
+    <div style="background-color: #f1f1f1; padding: 10px;">
+        <input id="chatInput" type="text" placeholder="Escribe aquí..." class="form-control form-control-sm mb-2" />
+        <div class="d-grid gap-1">
+            <button class="btn btn-sm btn-outline-primary" onclick="respuestaRapida('¿Qué juego me recomiendas?')">🎮 Recomendación</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="respuestaRapida('¿Cómo evaluo un juego?')">📝 Evaluación</button>
+            <button class="btn btn-sm btn-outline-primary" onclick="respuestaRapida('¿Qué pasa si veo violencia?')">⚠️ Violencia</button>
         </div>
     </div>
 </div>
-<div class="sin-juegos" th:if="${recomendaciones.size() == 0}">
-    Aún no tienes mensajes del supervisor.
-</div>
 
+<!-- Botón flotante -->
+<button onclick="toggleChat()" style="position: fixed; bottom: 20px; right: 20px; background-color: #6f42c1; color: #fff; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; font-weight: bold; z-index: 10000;">💬</button>
 
+<script>
+    function toggleChat() {
+        const chat = document.getElementById('chatbot');
+        chat.style.display = (chat.style.display === 'none') ? 'block' : 'none';
+    }
+
+    const input = document.getElementById("chatInput");
+    const chatBody = document.getElementById("chatBody");
+
+    input.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            const msg = input.value.trim();
+            if (msg !== "") {
+                chatBody.innerHTML += `<div><strong>Tú:</strong> ${msg}</div>`;
+                respuestaBot(msg.toLowerCase());
+                input.value = "";
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
+    });
+
+    function respuestaBot(msg) {
+        let respuesta = "Hmm... no entendí eso. ¿Puedes reformularlo?";
+        if (msg.includes("recomienda") || msg.includes("juego")) {
+            respuesta = "Te recomiendo probar alguno de tus juegos favoritos aprobados por el supervisor 🎯";
+        } else if (msg.includes("evaluación")) {
+            respuesta = "Puedes evaluar tus juegos haciendo clic en 📝 Evaluar Juego debajo de cada uno.";
+        } else if (msg.includes("violencia") || msg.includes("contenido")) {
+            respuesta = "Si percibes contenido violento, recuerda expresarlo en la evaluación para recibir orientación.";
+        } else if (msg.includes("hola")) {
+            respuesta = "¡Hola jugador! Estoy aquí para ayudarte a tener una experiencia segura 🎮";
+        } else if (msg.includes("gracias")) {
+            respuesta = "¡Con gusto! Para eso estoy 🧠";
+        }
+
+        setTimeout(() => {
+            chatBody.innerHTML += `<div><strong>SafeBot:</strong> ${respuesta}</div>`;
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }, 500);
+    }
+
+    function respuestaRapida(pregunta) {
+        chatBody.innerHTML += `<div><strong>Tú:</strong> ${pregunta}</div>`;
+        respuestaBot(pregunta.toLowerCase());
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+</script>
+
+<!-- Aquí seguiría tu SafeBot… -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
