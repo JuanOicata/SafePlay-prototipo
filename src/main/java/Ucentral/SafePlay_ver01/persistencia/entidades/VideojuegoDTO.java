@@ -11,7 +11,7 @@ public class VideojuegoDTO {
     private String publisher; // Publicador
     private String developer; // Desarrollador
     private boolean isApproved; // Estado de aprobación (true = apto, false = no apto)
-
+    private String gameUrl;
     // Getters y setters
     public String getTitle() {
         return title;
@@ -83,5 +83,13 @@ public class VideojuegoDTO {
 
     public void setApproved(boolean approved) {
         isApproved = approved;
+    }
+
+    public String getGameUrl() {
+        return gameUrl;
+    }
+
+    public void setGame_url(String gameUrl) {
+        this.gameUrl = gameUrl;
     }
 }

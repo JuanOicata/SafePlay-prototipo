@@ -1,7 +1,9 @@
 package Ucentral.SafePlay_ver01.controladores;
 
 import Ucentral.SafePlay_ver01.persistencia.entidades.Usuario;
+import Ucentral.SafePlay_ver01.persistencia.entidades.VideojuegoDTO;
 import Ucentral.SafePlay_ver01.servicios.UsuarioServicio;
+import Ucentral.SafePlay_ver01.servicios.VideojuegoServicio;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,14 +12,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
+
 @Controller
 public class UsuarioControlador {
 
     private final UsuarioServicio usuarioServicio;
+    private final VideojuegoServicio videojuegoServicio;
 
-    // Constructor con inyección de dependencias
-    public UsuarioControlador(UsuarioServicio usuarioServicio) {
+    public UsuarioControlador(UsuarioServicio usuarioServicio, VideojuegoServicio videojuegoServicio) {
         this.usuarioServicio = usuarioServicio;
+        this.videojuegoServicio = videojuegoServicio;
     }
 
     @GetMapping("/")
@@ -76,19 +81,14 @@ public class UsuarioControlador {
     @GetMapping("/jugador")
     public String mostrarPantallaJugador(HttpSession session, Model model) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return "redirect:/login";
+        if (usuario == null || !"jugador".equalsIgnoreCase(usuario.getRol())) {
+            return "redirect:/login";
+        }
 
+        List<VideojuegoDTO> juegosAprobados = videojuegoServicio.obtenerVideojuegosAprobados();
         model.addAttribute("usuario", usuario);
-        return "jugador"; // Debes crear esta vista
+        model.addAttribute("videojuegos", juegosAprobados);
+        return "jugador";
     }
-
-    /*@GetMapping("/supervisor")
-    public String mostrarPantallaSupervisor(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return "redirect:/login";
-
-        model.addAttribute("usuario", usuario);
-        return "supervisor"; // Debes crear esta vista
-    }*/
 
 }

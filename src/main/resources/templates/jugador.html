@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Jugador - SafePlay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #121212;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+        }
+
+        .container {
+            background: #1e1e2f;
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .game-card {
+            background-color: #2a2a4a;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 255, 204, 0.1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 24px rgba(0, 255, 204, 0.2);
+        }
+
+        .card-img-top {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #00ffcc;
+        }
+
+        .btn-jugar {
+            background-color: #00ffcc;
+            border: none;
+            color: #1e1e2f;
+            font-weight: bold;
+        }
+
+        .btn-jugar:hover {
+            background-color: #00ccaa;
+        }
+
+        h1 {
+            color: #00ffcc;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sin-juegos {
+            text-align: center;
+            font-style: italic;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Bienvenido, <span th:text="${usuario.nombre}">Jugador</span> 🎮</h1>
+
+    <h2 class="mb-4">Juegos Aprobados</h2>
+    <div class="row" th:if="${videojuegos.size() > 0}">
+        <div class="col-md-4" th:each="juego : ${videojuegos}">
+            <div class="game-card">
+                <img th:src="${juego.thumbnail}" class="card-img-top" th:alt="${juego.title}">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${juego.title}">Nombre</h5>
+                    <p class="card-text" th:text="${juego.shortDescription}">Descripción breve del juego.</p>
+                    <p><strong>Género:</strong> <span th:text="${juego.genre}">Acción</span></p>
+                    <p><strong>Plataforma:</strong> <span th:text="${juego.platform}">PC</span></p>
+                    <a class="btn btn-jugar btn-sm" th:href="${juego.gameUrl}" target="_blank">Jugar Ahora</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sin-juegos" th:if="${videojuegos.size() == 0}">
+        No hay juegos aprobados disponibles aún.
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
